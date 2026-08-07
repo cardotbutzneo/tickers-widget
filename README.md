@@ -47,6 +47,19 @@ pip install -r requirements.txt
 - `symbol` : ticker au format Yahoo Finance (`.PA` pour Paris, `.L` pour Londres, `^` pour un indice, pas de suffixe pour NASDAQ/NYSE).
 - `label` : nom affiché dans le tableau (libre).
 - `refresh_seconds` : fréquence de rafraîchissement. Éviter de descendre sous 15-30s pour ne pas se faire limiter par Yahoo Finance (API non officielle).
+  
+Pour ajouter: `./run.sh -a|--append [tikers]:[label]`  
+Pour supprimer: `./run.sh -r|--remove [tikers]`
+
+Exemple d'ajout et de suppression valide:
+````bash
+./run.sh -a LQQ:"LQQ (Amundi daily x2 NASDAQ)"
+./run.sh -r RMS:Hermes
+````
+Attention:
+Si vous ajouter un label qui contient des espaces ou caractères spéciaux, l'utilisation de guillemet "" est obligatoire.
+Le programme fait automatiquement la conversion du ticker EURONEXT à YahooFinance.
+Si vous rencontrez des problemes de configuration lors de l'ajout, merci de regarder le fichier action_connues.json.
 
 ## Lancement
 
@@ -58,7 +71,6 @@ chmod +x run.sh
 ### Alias pratique (zsh)
 
 Ajouter dans `~/.zshrc` :
-
 ```zsh
 alias stocks="~/.widget/stocks/run.sh"
 ```
@@ -67,10 +79,10 @@ Puis `stocks` depuis n'importe où lance le widget.
 
 ## Structure
 
-|--main.py
-|--run.sh
-|--README.md
-|--tickers.json
+|--main.py  
+|--run.sh  
+|--README.md  
+|--tickers.json  
 
 ## Notes
 

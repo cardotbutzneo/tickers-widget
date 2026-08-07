@@ -1,17 +1,5 @@
 {
     "refresh_seconds": 120,
     "tickers": [
-        {
-            "symbole": "LQQ.PA",
-            "label": "LQQ (Amundi NASDAQ daily x2)"
-        },
-        {
-            "symbole": "CS.PA",
-            "label": "AXA"
-        },
-        {
-            "symbole": "TTE.PA",
-            "label": "TotalEnergie"
-        }
     ]
 }

@@ -1,0 +1,8 @@
+[project]
+name = "stocks-display"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "rich>=15.0.0",
+    "yfinance>=1.5.2",
+]

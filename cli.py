@@ -12,7 +12,7 @@ from main import CONFIG_PATH, load_config
 SCRIPT_DIR = Path(__file__).parent
 KNOWN_TICKERS_PATH = SCRIPT_DIR / "actions_connues.json"
 
-MODES = ["-a", "--add", "-r", "--remove", "-h", "--help"]
+MODES = ["-a", "--add", "-r", "--remove", "-m", "--modify", "-h", "--help"]
 
 def print_help(mode: str = "") -> None:
     if mode == "":
@@ -28,7 +28,15 @@ def print_help(mode: str = "") -> None:
         print("Label optionnel après ':' (ex: RMS:Hermès). Par défaut, le ticker EURONEXT est utilisé.")
     elif mode in ("-r", "--remove"):
         print("Usage: stocks -r/--remove TICKER [TICKER ...]")
+    elif mode in ("-m", "--modify"):
+        print("Usage: stocks -m/--modify [TICKER] [LABEL]")
 
+def get_label(symbol: str, config: dict) -> str:
+    """Retourne le label associé à un symbole, ou le symbole lui-même si non trouvé."""
+    for entry in config["tickers"]:
+        if entry["symbol"] == symbol:
+            return entry.get("label", symbol)
+    return symbol
 
 def load_known_tickers() -> dict:
     """Charge le fichier de conversion EURONEXT -> yfinance."""
@@ -66,6 +74,7 @@ def add(euronext_ticker: str, label: str | None = None) -> bool:
 
     if any(t["symbole"] == symbol for t in config["tickers"]):
         print(f"{euronext_ticker} ({symbol}) est déjà suivi.")
+        print("Utilisez -m pour modifier le label")
         return False
 
     config["tickers"].append({"symbole": symbol, "label": label or euronext_ticker})
@@ -95,6 +104,27 @@ def remove(euronext_ticker: str) -> bool:
     print(f"{euronext_ticker} a bien été supprimé.")
     return True
 
+def modify_label(euronext_ticker: str, new_label: str) -> bool:
+    """Modifie le label existant d'un ticker déjà suivi."""
+    config = load_config()
+    known = load_known_tickers()
+    symbol = resolve_ticker(euronext_ticker, known)
+
+    if symbol is None:
+        print(f"Ticker non reconnu : {euronext_ticker}. Vérifiez {KNOWN_TICKERS_PATH.name}.")
+        return False
+
+    for entry in config["tickers"]:
+        if entry["symbole"] == symbol:
+            old_label = entry["label"]
+            entry["label"] = new_label
+            save_config(config)
+            print(f"Label modifié : {old_label} → {new_label} ({symbol})")
+            return True
+
+    print("Aucun produit enregistré avec ce ticker.")
+    return False
+
 def parse_ticker_arg(arg: str) -> tuple[str, str | None]:
     """
     Découpe un argument 'TICKER' ou 'TICKER:Label' en (ticker, label).
@@ -121,7 +151,7 @@ def main() -> None:
         sys.exit(1)
 
     if mode in ("-h", "--help"):
-        print_help()
+        print_help(args[1])
         sys.exit(0)
 
     raw_tickers = args[1:]
@@ -138,6 +168,10 @@ def main() -> None:
         for raw in raw_tickers:
             ticker, _ = parse_ticker_arg(raw)  # label ignoré pour remove
             remove(ticker)
+    elif mode in ("-m", "--modify"):
+        for raw in raw_tickers:
+            ticker, label = parse_ticker_arg(raw)
+            modify_label(ticker, label)
 
 
 if __name__ == "__main__":

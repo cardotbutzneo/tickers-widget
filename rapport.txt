@@ -1,0 +1,194 @@
+REVIEW DU PROJET "tickers-widget"
+==================================
+Date : 2026-08-07
+Fichiers revus : main.py, cli.py, README.md, run.sh, pyproject.toml,
+                  tickers.json, action_connues.json
+
+Cette review est faite par lecture de code uniquement (pas d'exécution,
+conformément à ta demande). Les points marqués [A VERIFIER SUR VM] sont
+des suppositions sur le comportement runtime à confirmer.
+
+
+1. BUGS BLOQUANTS (à corriger avant utilisation)
+--------------------------------------------------
+
+1.1 cli.py : mauvais nom de fichier pour les tickers connus
+    Ligne 13 :
+        KNOWN_TICKERS_PATH = SCRIPT_DIR / "actions_connues.json"
+    Le fichier réel s'appelle "action_connues.json" (sans le "s" à
+    "action"). Résultat : load_known_tickers() va toujours échouer
+    avec "Erreur : ... introuvable." et sys.exit(1). La commande
+    -a/--add ne peut donc jamais fonctionner en l'état.
+    Fix : corriger le nom de fichier (ou renommer le .json pour
+    matcher, au choix).
+
+1.2 cli.py : "--modify" n'est jamais reconnu comme commande valide
+    Ligne 15 :
+        MODES = ["-a", "--add", "-r", "--remove", "-m", "--remove", "-h", "--help"]
+    "--modify" a été tapé deux fois "--remove" par erreur de copier-coller.
+    Du coup taper `stocks --modify TICKER:Label` donne
+    "commande non reconnue" (seul `-m` fonctionne, pas `--modify`).
+    Fix : remplacer le second "--remove" par "--modify".
+
+1.3 main.py : save_historic() reçoit un dict au lieu d'un float
+    Ligne 139 :
+        save_historic(symbol, result)
+    Or save_historic est défini comme
+        def save_historic(ticker: str, price: float, type: str = "intraday") -> None
+    `result` est le dict retourné par fetch_price() (avec les clés
+    status/price/change/change_pct), pas le prix. Le cache stockera
+    donc littéralement l'objet dict sérialisé à la place d'un prix
+    numérique — l'historique sera inexploitable.
+    Fix : save_historic(symbol, result["price"])
+
+1.4 cli.py : get_label() utilise la mauvaise clé
+    Ligne 37 :
+        if entry["symbol"] == symbol:
+    Partout ailleurs (add/remove/modify_label, main.py, tickers.json)
+    la clé utilisée est "symbole" (français), pas "symbol". Cette
+    fonction lèvera une KeyError si elle est appelée. Bonne nouvelle :
+    elle n'est actuellement appelée nulle part dans le fichier — c'est
+    donc du code mort mais buggé. A corriger ou supprimer si inutile.
+
+
+2. INCOHERENCES / RISQUES DE CONFUSION
+----------------------------------------
+
+2.1 README.md vs code réel : clé "symbol" vs "symbole"
+    Le README (section Configuration) documente le format :
+        { "symbol": "AAPL", "label": "Apple" }
+    alors que le code (main.py, cli.py, tickers.json) attend "symbole"
+    (avec le e final). Un lecteur qui suit le README à la lettre va
+    éditer tickers.json avec la mauvaise clé et se retrouver avec un
+    tableau vide ou une KeyError selon le point d'entrée.
+
+2.2 cli.py : aide de --modify incohérente avec le parsing réel
+    print_help() annonce :
+        Usage: stocks -m/--modify [TICKER] [LABEL]
+    (séparés par un espace), mais main() route --modify via
+    parse_ticker_arg(), qui attend le format "TICKER:Label" (comme
+    pour --add). L'utilisateur qui suit l'aide affichée tapera la
+    mauvaise syntaxe.
+
+2.3 README.md : structure du projet obsolète
+    La section "Structure" ne liste que main.py, run.sh, README.md,
+    tickers.json. Il manque cli.py, action_connues.json et
+    pyproject.toml (qui existent bien dans le repo).
+
+2.4 README.md : installation "sans uv" référence un requirements.txt
+    inexistant
+    Le repo n'a que pyproject.toml (pas de requirements.txt). Les
+    instructions de fallback pip ne fonctionneront pas telles quelles.
+
+2.5 main.py : import time dupliqué
+    Lignes 8 et 10 :
+        import time
+        ...
+        import time
+    Sans conséquence fonctionnelle, mais à nettoyer.
+
+
+3. PROBLEME DE LOGIQUE A EXAMINER
+------------------------------------
+
+3.1 main.py : la sauvegarde d'historique ne se déclenche
+    (quasiment) jamais
+    Dans build_table(), `last_save = time.time()` est réinitialisé à
+    CHAQUE appel de build_table (donc à chaque cycle de refresh), puis
+    comparé à time.time() quelques lignes plus loin dans la même
+    fonction (le temps de faire les appels réseau pour les tickers
+    précédents). Comme TIME_BETWEEN_SAVE_S vaut 300s, il faudrait que
+    la boucle de fetch d'un seul cycle prenne plus de 5 minutes pour
+    qu'un seul point soit sauvegardé — ce qui n'arrivera jamais en
+    pratique. L'intention était probablement de comparer au dernier
+    save global (persisté entre les cycles, ex. variable au niveau
+    module ou timestamp stocké dans le cache), pas à une variable
+    locale réinitialisée à chaque tableau.
+    Impact : la fonctionnalité d'historique (intraday/weekly) ne
+    s'alimente jamais réellement.
+
+
+4. A VERIFIER SUR VM (comportement yfinance)
+-----------------------------------------------
+
+4.1 main.py ligne 95-98 : `ticker.fast_info` puis `.get("lastPrice")`
+    Selon les versions de yfinance, l'objet fast_info n'est pas
+    toujours un dict pur (parfois un objet FastInfo avec accès
+    dict-like partiel). Vérifie que `.get()` fonctionne bien avec la
+    version installée sur ta VM (yfinance>=1.5.2 dans pyproject.toml),
+    et que les clés sont bien "lastPrice"/"previousClose" (certaines
+    versions utilisent des variantes en snake_case, ex. "last_price").
+    Si erreur, l'exception est de toute façon catchée dans fetch_price
+    (donc pas de crash, juste un statut "error" partout).
+
+
+5. AMELIORATIONS SUGGEREES (non bloquantes)
+-----------------------------------------------
+
+5.1 Pas de .gitignore
+    cache.json (données générées, vide actuellement) et pyproject.toml
+    apparaissent comme fichiers non trackés dans git status. cache.json
+    en particulier ne devrait probablement pas être versionné (c'est
+    un fichier généré à l'exécution). Ajouter un .gitignore avec au
+    moins cache.json, __pycache__/, .venv/.
+
+5.2 Pas de gestion de casse pour les tickers EURONEXT
+    resolve_ticker() fait une recherche exacte dans action_connues.json
+    (sensible à la casse). Un utilisateur tapant "rms" au lieu de "RMS"
+    aura un "Ticker non reconnu" alors que le ticker existe. Envisager
+    un .upper() avant la recherche.
+
+5.3 cli.py : pas de vérification que resolve_ticker gère les indices
+    (^GSPC) ou tickers hors EURONEXT
+    Le CLI ne permet d'ajouter que ce qui est dans action_connues.json.
+    Pour ajouter un ticker US ou un indice (comme AAPL ou ^GSPC,
+    pourtant documentés dans le README), il faut éditer tickers.json
+    à la main — pas forcément un problème, mais à clarifier dans le
+    README que le CLI ne couvre que les tickers EURONEXT connus.
+
+5.4 Aucun test automatisé
+    Vu que tu ne peux pas exécuter le code toi-même dans cet
+    environnement, un petit test unitaire (ex. sur parse_ticker_arg,
+    resolve_ticker, ou fetch_price avec un mock) t'aiderait à valider
+    rapidement les corrections ci-dessus sur ta VM sans lancer le
+    widget complet à chaque fois.
+
+5.5 main.py : gestion d'erreur silencieuse sur `type` inconnu
+    save_historic() affiche une erreur console si `type` n'est ni
+    "intraday" ni "weekly", mais ce paramètre n'est jamais utilisé
+    par le seul appelant actuel (build_table utilise toujours la
+    valeur par défaut "intraday" implicitement vu le bug 1.3). A
+    surveiller si tu comptes activer un mode "weekly" plus tard.
+
+5.6 Shadowing du builtin `type`
+    save_historic(..., type: str = "intraday") utilise `type` comme
+    nom de paramètre, ce qui masque le builtin Python `type` à
+    l'intérieur de la fonction. Sans impact ici (le builtin n'est pas
+    utilisé dans le corps), mais à éviter par convention (ex. renommer
+    en `kind` ou `period`).
+
+
+6. PRIORITES SUGGEREES
+--------------------------
+1. Corriger 1.1, 1.2, 1.3, 1.4 (bugs bloquants, faciles à corriger)
+2. Aligner README et code sur "symbole" vs "symbol" (2.1)
+3. Revoir la logique de save (3.1) si l'historique t'intéresse vraiment
+4. Ajouter un .gitignore (5.1)
+5. Le reste est cosmétique / confort, à faire si tu as le temps.
+
+
+Globalement le projet est propre et bien commenté pour un outil perso :
+séparation main.py (affichage) / cli.py (gestion config) claire,
+gestion d'erreurs pensée pour ne jamais crasher la boucle d'affichage.
+Les bugs trouvés sont typiquement le genre d'erreurs de copier-coller
+(1.2, 2.1) ou de clé mal renommée (1.4) qu'on ne voit qu'à la relecture
+ou à l'usage — rien de structurel à revoir.
+
+# TODO
+
+## Point a améliorer:
+# 1. Pas de gestion des autres bourses dans action_connues.json -> donner la possibilité de préciser la bourse lors de la création et gérer ensuite dans le dictionnaire json
+# 2. L'ajout des zones ne fonctionne pas correctement. Si il est 20h un vendredi (Paris fermé) le warning ne s'affiche pas
+
+## Piste d'amélioration
+...

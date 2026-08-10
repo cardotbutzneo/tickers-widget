@@ -11,13 +11,14 @@ if ! command -v uv > /dev/null && ! command -v python3 > /dev/null; then
     exit 1
 fi
 
-# Détermine le script à lancer : gestion des tickers si arguments fournis,
-# sinon lancement du widget (comportement par défaut)
-if [ "$#" -gt 0 ]; then
-    TARGET="cli.py"
-else
+# Détermine le script à lancer : "run" lance le widget live (main.py),
+# tout le reste est délégué au CLI de gestion des tickers (cli.py)
+if [ "$#" -gt 0 ] && [ "$1" = "run" ]; then
     TARGET="main.py"
+    shift
     clear
+else
+    TARGET="cli.py"
 fi
 
 if command -v uv > /dev/null; then
@@ -29,6 +30,5 @@ else
         exit 1
     fi
     source .venv/bin/activate
-    # utilise un CLI python pour l'installation (convertie les tickers EURONEXT en yfinance)
     python3 "$TARGET" "$@"
 fi

@@ -1,46 +1,366 @@
 {
-  "actions": {
-    "MC": "MC.PA",
-    "ASML": "ASML.AS",
-    "TTE": "TTE.PA",
-    "OR": "OR.PA",
-    "SAN": "SAN.PA",
-    "SU": "SU.PA",
-    "AIR": "AIR.PA",
-    "RMS": "RMS.PA",
-    "BNP": "BNP.PA",
-    "AI": "AI.PA",
-    "ABI": "ABI.BR",
-    "CS": "CS.PA",
-    "PRX": "PRX.AS",
-    "RACE": "RACE.MI",
-    "INGA": "INGA.AS",
-    "DG": "DG.PA",
-    "ENGI": "ENGI.PA",
-    "STLAM": "STLAM.MI",
-    "SGO": "SGO.PA",
-    "EL": "EL.PA",
-    "EDP": "EDP.LS",
-    "GLE": "GLE.PA",
-    "ACA": "ACA.PA",
-    "HO": "HO.PA",
-    "ORA": "ORA.PA",
-    "BN": "BN.PA",
-    "KER": "KER.PA"
-  },
-  "etf": {
-    "CW8": "CW8.PA",
-    "EWLD": "EWLD.PA",
-    "PE500": "PE500.PA",
-    "ESE": "ESE.PA",
-    "C40": "C40.PA",
-    "PUST": "PUST.PA",
-    "UST": "UST.PA",
-    "PAEEM": "PAEEM.PA",
-    "WLD": "WLD.PA",
-    "MEU": "MEU.PA",
-    "LQQ" : "LQQ.PA",
-    "PSP5": "PSP5.PA",
-    "DCAM" : "DCAM.PA"
-  }
+  "actions": [
+    {
+      "symbol": "MC.PA",
+      "label": "LVMH",
+      "name": "LVMH Moët Hennessy Louis Vuitton SE",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ASML.AS",
+      "label": "ASML",
+      "name": "ASML Holding N.V.",
+      "type": "stock",
+      "exchange": "Euronext Amsterdam",
+      "currency": "EUR",
+      "country": "NL"
+    },
+    {
+      "symbol": "TTE.PA",
+      "label": "TotalEnergies",
+      "name": "TotalEnergies SE",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "OR.PA",
+      "label": "L'Oréal",
+      "name": "L'Oréal S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "SAN.PA",
+      "label": "Sanofi",
+      "name": "Sanofi",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "SU.PA",
+      "label": "Schneider Electric",
+      "name": "Schneider Electric SE",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "AIR.PA",
+      "label": "Airbus",
+      "name": "Airbus SE",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "RMS.PA",
+      "label": "Hermès",
+      "name": "Hermès International",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "BNP.PA",
+      "label": "BNP Paribas",
+      "name": "BNP Paribas",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "AI.PA",
+      "label": "Air Liquide",
+      "name": "Air Liquide S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ABI.BR",
+      "label": "AB InBev",
+      "name": "Anheuser-Busch InBev SA/NV",
+      "type": "stock",
+      "exchange": "Euronext Brussels",
+      "currency": "EUR",
+      "country": "BE"
+    },
+    {
+      "symbol": "CS.PA",
+      "label": "AXA",
+      "name": "AXA SA",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "PRX.AS",
+      "label": "Prosus",
+      "name": "Prosus N.V.",
+      "type": "stock",
+      "exchange": "Euronext Amsterdam",
+      "currency": "EUR",
+      "country": "NL"
+    },
+    {
+      "symbol": "RACE.MI",
+      "label": "Ferrari",
+      "name": "Ferrari N.V.",
+      "type": "stock",
+      "exchange": "Borsa Italiana",
+      "currency": "EUR",
+      "country": "IT"
+    },
+    {
+      "symbol": "INGA.AS",
+      "label": "ING Groep",
+      "name": "ING Groep N.V.",
+      "type": "stock",
+      "exchange": "Euronext Amsterdam",
+      "currency": "EUR",
+      "country": "NL"
+    },
+    {
+      "symbol": "DG.PA",
+      "label": "Vinci",
+      "name": "Vinci SA",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ENGI.PA",
+      "label": "Engie",
+      "name": "Engie SA",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "STLAM.MI",
+      "label": "Stellantis",
+      "name": "Stellantis N.V.",
+      "type": "stock",
+      "exchange": "Borsa Italiana",
+      "currency": "EUR",
+      "country": "NL"
+    },
+    {
+      "symbol": "SGO.PA",
+      "label": "Saint-Gobain",
+      "name": "Compagnie de Saint-Gobain S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "EL.PA",
+      "label": "EssilorLuxottica",
+      "name": "EssilorLuxottica SA",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "EDP.LS",
+      "label": "EDP",
+      "name": "Energias de Portugal, S.A.",
+      "type": "stock",
+      "exchange": "Euronext Lisbon",
+      "currency": "EUR",
+      "country": "PT"
+    },
+    {
+      "symbol": "GLE.PA",
+      "label": "Société Générale",
+      "name": "Société Générale S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ACA.PA",
+      "label": "Crédit Agricole",
+      "name": "Crédit Agricole S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "HO.PA",
+      "label": "Thales",
+      "name": "Thales S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ORA.PA",
+      "label": "Orange",
+      "name": "Orange S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "BN.PA",
+      "label": "Danone",
+      "name": "Danone S.A.",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "KER.PA",
+      "label": "Kering",
+      "name": "Kering SA",
+      "type": "stock",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    }
+  ],
+  "etf": [
+    {
+      "symbol": "CW8.PA",
+      "label": "Amundi MSCI World",
+      "name": "Amundi MSCI World UCITS ETF Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "EWLD.PA",
+      "label": "Lyxor PEA MSCI World",
+      "name": "Lyxor PEA MSCI World UCITS ETF - Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "PE500.PA",
+      "label": "Amundi PEA S&P 500",
+      "name": "Amundi PEA S&P 500 UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "ESE.PA",
+      "label": "Amundi S&P 500 ESG",
+      "name": "Amundi S&P 500 ESG UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "C40.PA",
+      "label": "Lyxor PEA CAC 40",
+      "name": "Lyxor PEA CAC 40 UCITS ETF - Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "PUST.PA",
+      "label": "Amundi PEA Nasdaq-100",
+      "name": "Amundi PEA NASDAQ-100 UCITS ETF Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "UST.PA",
+      "label": "Lyxor PEA Nasdaq-100",
+      "name": "Lyxor PEA Nasdaq-100 UCITS ETF - Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "PAEEM.PA",
+      "label": "Amundi PEA Emerging Markets",
+      "name": "Amundi PEA Emerging Markets UCITS ETF Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "WLD.PA",
+      "label": "Amundi MSCI World",
+      "name": "Amundi MSCI World UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "MEU.PA",
+      "label": "Amundi MSCI Europe",
+      "name": "Amundi MSCI Europe UCITS ETF Acc",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "LQQ.PA",
+      "label": "Lyxor PEA Nasdaq-100 2X",
+      "name": "Lyxor PEA Nasdaq-100 Daily (2X) Leveraged UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "PSP5.PA",
+      "label": "Amundi PEA S&P 500",
+      "name": "Amundi PEA S&P 500 UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    },
+    {
+      "symbol": "DCAM.PA",
+      "label": "Amundi World Climate Transition",
+      "name": "Amundi ETF MSCI World Climate Transition UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "FR"
+    }
+  ]
 }

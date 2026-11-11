@@ -131,7 +131,7 @@ def paris_market_closing_warning(config: dict) -> str | None:
     moins un ticker suivi est coté sur Euronext Paris (suffixe .PA). None
     sinon. Ne gère pas les jours fériés, ni les autres places boursières.
     """
-    if not any(entry["symbole"].endswith(".PA") for entry in config["tickers"]):
+    if not any(entry["symbol"].endswith(".PA") for entry in config["tickers"]):
         return None
 
     now = datetime.now(PARIS_TZ)
@@ -163,7 +163,7 @@ def build_table(config: dict, sort_spec: tuple[str, bool] | None = None) -> Tabl
 
     rows = []
     for entry in config["tickers"]:
-        symbol = entry["symbole"]
+        symbol = entry["symbol"]
         label = entry.get("label", symbol)
         pru = entry.get("pru", "--")
         rows.append({"symbol": symbol, "label": label, "pru": pru, "result": fetch_price(symbol)})

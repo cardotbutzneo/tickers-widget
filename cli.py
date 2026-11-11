@@ -60,8 +60,9 @@ def load_known_tickers() -> dict:
 def resolve_ticker(euronext_ticker: str, known: dict) -> str | None:
     """Retourne le symbole yfinance correspondant, ou None si inconnu."""
     for category in ("actions", "etf"):
-        if euronext_ticker in known.get(category, {}):
-            return known[category][euronext_ticker]
+        for item in known[category]:
+            if item["symbol"] == euronext_ticker:
+                return item["label"]
     return None
 
 
@@ -81,12 +82,21 @@ def add(euronext_ticker: str, label: str | None = None, pru: float | None = None
 
     config = load_config()
 
-    if any(t["symbole"] == symbol for t in config["tickers"]):
+    if any(t["symbol"] == symbol for t in config["tickers"]):
         print(f"{euronext_ticker} ({symbol}) est déjà suivi.")
         print("Utilisez -m pour modifier le label ou d'autres informations")
         return False
 
-    config["tickers"].append({"symbole": symbol, "label": label or euronext_ticker, "pru": pru, "quantity": quantity})
+    current = next((item for item in known["actions"] + known["etf"] if item["symbol"] == euronext_ticker), None)
+
+    config["tickers"].append({"symbol": symbol, 
+                            "label": label or euronext_ticker, 
+                            "name": current.get("name", "") if current else "",
+                            "type": current.get("type", "action") if current else "action", 
+                            "exchange": current.get("market", "EURONEXT") if current else "EURONEXT",
+                            "currency": current.get("currency", "EUR") if current else "EUR", 
+                            "country": current.get("country", "FR") if current else "FR",
+                            "pru": pru, "quantity": quantity})
     save_config(config)
     print(f"{euronext_ticker} ({symbol}) a bien été ajouté.")
     return True
@@ -103,7 +113,7 @@ def remove(euronext_ticker: str) -> bool:
 
     config = load_config()
     before = len(config["tickers"])
-    config["tickers"] = [t for t in config["tickers"] if t["symbole"] != symbol]
+    config["tickers"] = [t for t in config["tickers"] if t["symbol"] != symbol]
 
     if len(config["tickers"]) == before:
         print(f"{euronext_ticker} ({symbol}) n'était pas dans la liste suivie.")
@@ -124,7 +134,7 @@ def modify_label(euronext_ticker: str, new_label: str, new_pru: float | None = N
         return False
 
     for entry in config["tickers"]:
-        if entry["symbole"] == symbol:
+        if entry["symbol"] == symbol:
             old_label = entry["label"]
             entry["label"] = new_label
             entry["pru"] = new_pru
@@ -150,12 +160,24 @@ def parse_ticker_arg(
     parts = arg.split(":", 3)
 
     ticker = parts[0].strip()
+    with open(KNOWN_TICKERS_PATH, "r", encoding="utf-8") as f:
+        known = json.load(f)
+
     label = None
     pru = None
     quantity = None
 
+    known_label = next(
+        (
+            item["label"]
+            for item in known["actions"] + known["etf"]
+            if item["symbol"] == ticker
+        ),
+        None
+    )
+
     if len(parts) >= 2:
-        label = parts[1].strip() or None
+        label = parts[1].strip() or known_label
 
     if len(parts) >= 3 and parts[2].strip():
         pru = float(parts[2].strip())
@@ -192,11 +214,11 @@ def main() -> None:
 
     if mode in ("-a", "--add"):
         for raw in raw_tickers:
-            ticker, label = parse_ticker_arg(raw)
-            add(ticker, label)
+            ticker, label, pru, quantity = parse_ticker_arg(raw)
+            add(ticker, label, pru, quantity)
     elif mode in ("-r", "--remove"):
         for raw in raw_tickers:
-            ticker, _ = parse_ticker_arg(raw)  # label ignoré pour remove
+            ticker, _, _, _ = parse_ticker_arg(raw)  # label ignoré pour remove
             remove(ticker)
     elif mode in ("-m", "--modify"):
         for raw in raw_tickers:

@@ -1,21 +1,32 @@
 {
-    "refresh_seconds": 120,
+    "refresh_seconds": 30,
     "tickers": [
         {
-            "symbole": "CS.PA",
-            "label": "AXA"
+            "symbol": "AAPL",
+            "label": "Apple",
+            "name": "Apple Inc.",
+            "type": "stock",
+            "exchange": "NASDAQ",
+            "currency": "USD",
+            "country": "US"
         },
         {
-            "symbole": "TTE.PA",
-            "label": "TotalEnergie"
+            "symbol": "CW8.PA",
+            "label": "Amundi MSCI World",
+            "name": "Amundi MSCI World UCITS ETF",
+            "type": "etf",
+            "exchange": "Euronext Paris",
+            "currency": "EUR",
+            "country": "LU"
         },
         {
-            "symbole": "LQQ.PA",
-            "label": "LQQ (Amundi NASDAQ daily x2)"
-        },
-        {
-            "symbole": "DCAM.PA",
-            "label": "DCAM"
+            "symbol": "^GSPC",
+            "label": "S&P 500",
+            "name": "S&P 500 Index",
+            "type": "index",
+            "exchange": "S&P Dow Jones Indices",
+            "currency": "USD",
+            "country": "US"
         }
     ]
 }

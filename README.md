@@ -35,18 +35,45 @@ Pour éditer la table deux options:
 1. Éditer `tickers.json` :
 
 ```json
+
 {
   "refresh_seconds": 30,
   "tickers": [
-    { "symbol": "AAPL", "label": "Apple" },
-    { "symbol": "CW8.PA", "label": "Amundi MSCI World" },
-    { "symbol": "^GSPC", "label": "S&P 500" }
+    {
+      "symbol": "AAPL",
+      "label": "Apple",
+      "name": "Apple Inc.",
+      "type": "stock",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "country": "US"
+    },
+    {
+      "symbol": "CW8.PA",
+      "label": "Amundi MSCI World",
+      "name": "Amundi MSCI World UCITS ETF",
+      "type": "etf",
+      "exchange": "Euronext Paris",
+      "currency": "EUR",
+      "country": "LU"
+    },
+    {
+      "symbol": "^GSPC",
+      "label": "S&P 500",
+      "name": "S&P 500 Index",
+      "type": "index",
+      "exchange": "S&P Dow Jones Indices",
+      "currency": "USD",
+      "country": "US"
+    }
   ]
 }
+
 ```
+_note: Les métadonnées sont stockées localement et donc peuvent avoir des erreurs. Si vous constatez des erreurs n'hesitez pas à les corriger._
 
 - `symbol` : ticker au format Yahoo Finance (`.PA` pour Paris, `.L` pour Londres, `^` pour un indice, pas de suffixe pour NASDAQ/NYSE).
-- `label` : nom affiché dans le tableau (libre).
+- `label` : nom affiché dans le tableau (libre). Par défaut récupère le nom dans les métadonnées.
 - `pru` : votre pru
 - `quantity` : votre quantité possédé
 - `refresh_seconds` : fréquence de rafraîchissement. Éviter de descendre sous 15-30s pour ne pas se faire limiter par Yahoo Finance (API non officielle).  

@@ -47,11 +47,15 @@ Pour éditer la table deux options:
 
 - `symbol` : ticker au format Yahoo Finance (`.PA` pour Paris, `.L` pour Londres, `^` pour un indice, pas de suffixe pour NASDAQ/NYSE).
 - `label` : nom affiché dans le tableau (libre).
-- `refresh_seconds` : fréquence de rafraîchissement. Éviter de descendre sous 15-30s pour ne pas se faire limiter par Yahoo Finance (API non officielle).
+- `pru` : votre pru
+- `quantity` : votre quantité possédé
+- `refresh_seconds` : fréquence de rafraîchissement. Éviter de descendre sous 15-30s pour ne pas se faire limiter par Yahoo Finance (API non officielle).  
+
+Toutes les informations sont stockées localement. Pour le PRU et la quantité vous pouvez la modifier à la main (via le fichier) ou utiliser la commande -m|--modify. Lors de votre première utilisation vous devrez renseigner le PRU et la quantité, sinon vous pouvez modifier le fichier directement.  
 
 2. Utiliser une commande:
 ```bash
-./run.sh -a|--add [TICKERS]:[LABEL] 
+./run.sh -a|--add [TICKERS]:[LABEL]:[PRU]:[QUANTITE]
 ```
 La commande est plus robuste car elle gère directement la conversion EURONEXT -> yfinance des tickers.  
 Attention: si une action / ETF / indice n'est pas pas reconnu veuillez vérifier son existence dans le fichier `actions_connues.json`.  
@@ -62,8 +66,9 @@ Pour retirer une action il suffit d'utilier `-r|--remove`
 
 Vous pouvez par ailleurs modifier le label via la commande `-m|--modify`
 ````bash
-./run.sh -m|--modify [TICKER]:[NOUVEAU LABEL]
+./run.sh -m|--modify [TICKER]:[NOUVEAU LABEL]:[PRU]:[QUANTITE]
 ````
+[PRU] et [QUANTITE] sont optionnels.
 ## Lancement
 
 ```bash
@@ -106,7 +111,7 @@ Ajouter dans `~/.zshrc` :
 alias stocks="~/.widget/stocks/run.sh"
 ```
 
-Puis `stocks run` depuis n'importe où lance le widget.
+Puis `stocks run` depuis n'importe où sur votre ordinateur lance le widget.
 
 ## Structure
 

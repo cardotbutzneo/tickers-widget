@@ -62,7 +62,7 @@ def resolve_ticker(euronext_ticker: str, known: dict) -> str | None:
     for category in ("actions", "etf"):
         for item in known[category]:
             if item["symbol"] == euronext_ticker:
-                return item["label"]
+                return item["symbol"]
     return None
 
 
@@ -89,8 +89,8 @@ def add(euronext_ticker: str, label: str | None = None, pru: float | None = None
 
     current = next((item for item in known["actions"] + known["etf"] if item["symbol"] == euronext_ticker), None)
 
-    config["tickers"].append({"symbol": symbol, 
-                            "label": label or euronext_ticker, 
+    config["tickers"].append({"symbol": label or euronext_ticker, 
+                            "label": symbol, 
                             "name": current.get("name", "") if current else "",
                             "type": current.get("type", "action") if current else "action", 
                             "exchange": current.get("market", "EURONEXT") if current else "EURONEXT",

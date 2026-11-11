@@ -12,7 +12,7 @@ from main import CONFIG_PATH, load_config
 SCRIPT_DIR = Path(__file__).parent
 KNOWN_TICKERS_PATH = SCRIPT_DIR / "actions_connues.json"
 
-MODES = ["-a", "--add", "-r", "--remove", "-m", "--modify", "-h", "--help"]
+MODES = ["-a", "--add", "-r", "--remove", "-m", "--modify", "-h", "--help", "-s", "--sort"]
 
 def print_help(mode: str = "") -> None:
     if mode == "":
@@ -30,6 +30,15 @@ def print_help(mode: str = "") -> None:
         print("Usage: stocks -r/--remove TICKER [TICKER ...]")
     elif mode in ("-m", "--modify"):
         print("Usage: stocks -m/--modify [TICKER] [LABEL]")
+    elif mode in ("-s", "--sort"):
+        print("Usage: ./run.sh run --sort -c|-d|-vc|-vd|-ac|-ad")
+        print("Trie le tableau via le type de trie demandé:")
+        print("-c: valeur croissante")
+        print("-d: valeur décroissante")
+        print("-vc: variation croissante")
+        print("-vd: variation décroissante")
+        print("-ac: ordre alphabetique")
+        print("-ad: ordre alphabétique inverse")
 
 def get_label(symbol: str, config: dict) -> str:
     """Retourne le label associé à un symbole, ou le symbole lui-même si non trouvé."""
@@ -61,7 +70,7 @@ def save_config(config: dict) -> None:
         json.dump(config, f, indent=4, ensure_ascii=False)
 
 
-def add(euronext_ticker: str, label: str | None = None) -> bool:
+def add(euronext_ticker: str, label: str | None = None, pru: float | None = None, quantity: int | None = None) -> bool:
     """Ajoute un ticker (format EURONEXT) à tickers.json."""
     known = load_known_tickers()
     symbol = resolve_ticker(euronext_ticker, known)
@@ -74,10 +83,10 @@ def add(euronext_ticker: str, label: str | None = None) -> bool:
 
     if any(t["symbole"] == symbol for t in config["tickers"]):
         print(f"{euronext_ticker} ({symbol}) est déjà suivi.")
-        print("Utilisez -m pour modifier le label")
+        print("Utilisez -m pour modifier le label ou d'autres informations")
         return False
 
-    config["tickers"].append({"symbole": symbol, "label": label or euronext_ticker})
+    config["tickers"].append({"symbole": symbol, "label": label or euronext_ticker, "pru": pru, "quantity": quantity})
     save_config(config)
     print(f"{euronext_ticker} ({symbol}) a bien été ajouté.")
     return True
@@ -104,7 +113,7 @@ def remove(euronext_ticker: str) -> bool:
     print(f"{euronext_ticker} a bien été supprimé.")
     return True
 
-def modify_label(euronext_ticker: str, new_label: str) -> bool:
+def modify_label(euronext_ticker: str, new_label: str, new_pru: float | None = None, new_qty: int | None = None) -> bool:
     """Modifie le label existant d'un ticker déjà suivi."""
     config = load_config()
     known = load_known_tickers()
@@ -118,6 +127,8 @@ def modify_label(euronext_ticker: str, new_label: str) -> bool:
         if entry["symbole"] == symbol:
             old_label = entry["label"]
             entry["label"] = new_label
+            entry["pru"] = new_pru
+            entry["quantity"] = new_qty
             save_config(config)
             print(f"Label modifié : {old_label} → {new_label} ({symbol})")
             return True
@@ -125,16 +136,34 @@ def modify_label(euronext_ticker: str, new_label: str) -> bool:
     print("Aucun produit enregistré avec ce ticker.")
     return False
 
-def parse_ticker_arg(arg: str) -> tuple[str, str | None]:
+def parse_ticker_arg(
+    arg: str
+) -> tuple[str, str | None, float | None, int | None]:
     """
-    Découpe un argument 'TICKER' ou 'TICKER:Label' en (ticker, label).
-    Le label est None si non fourni.
+    Découpe un argument :
+    TICKER
+    TICKER:Label
+    TICKER:Label:PRU:Quantity
+
+    Retourne (ticker, label, pru, quantity).
     """
-    if ":" in arg:
-        ticker, label = arg.split(":", 1)
-        label = label.strip() or None
-        return ticker.strip(), label
-    return arg.strip(), None
+    parts = arg.split(":", 3)
+
+    ticker = parts[0].strip()
+    label = None
+    pru = None
+    quantity = None
+
+    if len(parts) >= 2:
+        label = parts[1].strip() or None
+
+    if len(parts) >= 3 and parts[2].strip():
+        pru = float(parts[2].strip())
+
+    if len(parts) >= 4 and parts[3].strip():
+        quantity = int(parts[3].strip())
+
+    return ticker, label, pru, quantity
 
 def main() -> None:
     args = sys.argv[1:]
@@ -151,7 +180,8 @@ def main() -> None:
         sys.exit(1)
 
     if mode in ("-h", "--help"):
-        print_help(args[1])
+        if len(args) > 1: print_help(args[1])
+        else: print_help("")
         sys.exit(0)
 
     raw_tickers = args[1:]
@@ -170,8 +200,8 @@ def main() -> None:
             remove(ticker)
     elif mode in ("-m", "--modify"):
         for raw in raw_tickers:
-            ticker, label = parse_ticker_arg(raw)
-            modify_label(ticker, label)
+            ticker, label, pru, qty = parse_ticker_arg(raw)
+            modify_label(ticker, label, pru, qty)
 
 
 if __name__ == "__main__":

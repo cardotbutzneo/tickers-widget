@@ -12,6 +12,10 @@
         {
             "symbole": "LQQ.PA",
             "label": "LQQ (Amundi NASDAQ daily x2)"
+        },
+        {
+            "symbole": "DCAM.PA",
+            "label": "DCAM"
         }
     ]
 }

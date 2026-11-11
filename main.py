@@ -21,7 +21,7 @@ CACHE_PATH = Path(__file__).parent / "cache.json"
 
 MAX_INTRADAY_POINTS = 200
 MAX_WEEKLY_POINTS = 5
-TIME_BETWEEN_SAVE_S = 300
+#TIME_BETWEEN_SAVE_S = 300
 console = Console()
 
 # Tri (./run.sh run --sort -c|-d|-vc|-vd|-ac|-ad)
@@ -52,38 +52,6 @@ def load_cache() -> dict:
     except json.JSONDecodeError as e:
         console.print(f"[red]Erreur : cache corrompu ({e}). Réinitialisation.[/red]")
         return {}
-
-
-def save_historic(ticker: str, price: float, type: str = "intraday") -> None:
-    """
-    Ajoute un point de prix à l'historique local du ticker.
-    type: 'intraday' (jusqu'à 200 points) ou 'weekly' (5 points, rotation FIFO).
-    """
-    cache = load_cache()
-    cache.setdefault(ticker, {"intraday": [], "weekly": []})
-
-    point = {"ts": int(time.time()), "price": price}
-
-    if type == "intraday":
-        cache[ticker]["intraday"].append(point)
-        if len(cache[ticker]["intraday"]) > MAX_INTRADAY_POINTS:
-            # tableau rotatif : on retire le plus ancien
-            cache[ticker]["intraday"] = cache[ticker]["intraday"][-MAX_INTRADAY_POINTS:]
-
-    elif type == "weekly":
-        cache[ticker]["weekly"].append(point)
-        if len(cache[ticker]["weekly"]) > MAX_WEEKLY_POINTS:
-            cache[ticker]["weekly"] = cache[ticker]["weekly"][-MAX_WEEKLY_POINTS:]
-
-    else:
-        console.print(f"[red]Erreur : type d'historique inconnu ({type}).[/red]")
-        return
-
-    try:
-        with open(CACHE_PATH, "w", encoding="utf-8") as f:
-            json.dump(cache, f, indent=2, ensure_ascii=False)
-    except OSError as e:
-        console.print(f"[red]Erreur : impossible d'écrire le cache ({e}).[/red]")
 
 def load_config() -> dict:
     """Charge tickers.json. Quitte proprement si le fichier est absent/invalide."""
@@ -133,6 +101,13 @@ def fetch_price(symbol: str) -> dict:
         # On les attrape toutes pour ne jamais casser l'affichage global.
         return {"status": "error", "message": str(e)[:40]}
 
+def get_total_portfolio_value(config: dict) -> float:
+
+    return sum(
+        ticker["pru"] * ticker["quantity"] if ticker.get("pru") and ticker.get("quantity") else 0
+        for ticker in config["tickers"]
+    )
+
 
 def parse_sort_args(argv: list[str]) -> tuple[str, bool] | None:
     """
@@ -178,17 +153,20 @@ def paris_market_closing_warning(config: dict) -> str | None:
 
 def build_table(config: dict, sort_spec: tuple[str, bool] | None = None) -> Table:
     """Construit le tableau rich pour un cycle de refresh."""
+
     table = Table(title="Suivi boursier", show_lines=False)
     table.add_column("Actif", style="bold")
     table.add_column("Ticker", style="dim")
     table.add_column("Prix", justify="right")
+    table.add_column("PRU", justify="right")
     table.add_column("Variation", justify="right")
 
     rows = []
     for entry in config["tickers"]:
         symbol = entry["symbole"]
         label = entry.get("label", symbol)
-        rows.append({"symbol": symbol, "label": label, "result": fetch_price(symbol)})
+        pru = entry.get("pru", "--")
+        rows.append({"symbol": symbol, "label": label, "pru": pru, "result": fetch_price(symbol)})
 
     ok_rows = [r for r in rows if r["result"]["status"] == "ok"]
     error_rows = [r for r in rows if r["result"]["status"] != "ok"]
@@ -200,19 +178,15 @@ def build_table(config: dict, sort_spec: tuple[str, bool] | None = None) -> Tabl
         else:
             ok_rows.sort(key=lambda r: r["result"][key], reverse=reverse)
 
-    last_save = time.time()
-
     for row in ok_rows + error_rows:
         symbol = row["symbol"]
         label = row["label"]
+        pru = row["pru"]
         result = row["result"]
 
         if result["status"] == "error":
             table.add_row(label, symbol, "—", Text(result["message"], style="red"))
             continue
-
-        if time.time() - last_save >= TIME_BETWEEN_SAVE_S:
-            save_historic(symbol, result["price"])
 
         price_str = f"{result['price']:.2f}"
         change = result["change"]
@@ -224,7 +198,7 @@ def build_table(config: dict, sort_spec: tuple[str, bool] | None = None) -> Tabl
             f"{sign}{change:.2f} ({sign}{change_pct:.2f}%)", style=color
         )
 
-        table.add_row(label, symbol, f"{price_str}€", change_str)
+        table.add_row(label, symbol, f"{price_str}€", f"{pru} €", change_str)
 
     return table
 
@@ -251,6 +225,7 @@ def main():
     try:
         with Live(build_renderable(config, sort_spec), refresh_per_second=1, console=console) as live:
             while True:
+                console.print(f"Valeur totale intestie: {get_total_portfolio_value(config)} €")
                 time.sleep(refresh_seconds)
                 live.update(build_renderable(config, sort_spec))
     except KeyboardInterrupt:

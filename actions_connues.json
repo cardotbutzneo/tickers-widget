@@ -256,8 +256,8 @@
     },
     {
       "symbol": "EWLD.PA",
-      "label": "Lyxor PEA MSCI World",
-      "name": "Lyxor PEA MSCI World UCITS ETF - Acc",
+      "label": "Amundi PEA MSCI World",
+      "name": "Amundi PEA MSCI World UCITS ETF - Acc",
       "type": "etf",
       "exchange": "Euronext Paris",
       "currency": "EUR",
@@ -283,8 +283,8 @@
     },
     {
       "symbol": "C40.PA",
-      "label": "Lyxor PEA CAC 40",
-      "name": "Lyxor PEA CAC 40 UCITS ETF - Acc",
+      "label": "Amundi PEA CAC 40",
+      "name": "Amundi PEA CAC 40 UCITS ETF - Acc",
       "type": "etf",
       "exchange": "Euronext Paris",
       "currency": "EUR",
@@ -301,8 +301,8 @@
     },
     {
       "symbol": "UST.PA",
-      "label": "Lyxor PEA Nasdaq-100",
-      "name": "Lyxor PEA Nasdaq-100 UCITS ETF - Acc",
+      "label": "Amundi PEA Nasdaq-100",
+      "name": "Amundi PEA Nasdaq-100 UCITS ETF - Acc",
       "type": "etf",
       "exchange": "Euronext Paris",
       "currency": "EUR",
@@ -337,8 +337,8 @@
     },
     {
       "symbol": "LQQ.PA",
-      "label": "Lyxor PEA Nasdaq-100 2X",
-      "name": "Lyxor PEA Nasdaq-100 Daily (2X) Leveraged UCITS ETF",
+      "label": "Amundi PEA Nasdaq-100 2X",
+      "name": "Amundi PEA Nasdaq-100 Daily (2X) Leveraged UCITS ETF",
       "type": "etf",
       "exchange": "Euronext Paris",
       "currency": "EUR",

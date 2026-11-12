@@ -225,7 +225,7 @@ def main():
     try:
         with Live(build_renderable(config, sort_spec), refresh_per_second=1, console=console) as live:
             while True:
-                console.print(f"Valeur totale intestie: {get_total_portfolio_value(config)} €")
+                console.print(f"Valeur totale intestie: {get_total_portfolio_value(config):.2f} €")
                 time.sleep(refresh_seconds)
                 live.update(build_renderable(config, sort_spec))
     except KeyboardInterrupt:
